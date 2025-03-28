@@ -1,36 +1,62 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useSession } from "@/hooks/useSession";
 import { cn } from "@/lib/utils";
 import { useState } from "react";
+import Markdown from "react-markdown";
 
 interface Message {
-  id: number;
   content: string;
   role: "user" | "assistant";
 }
 
 export function Chat() {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const session = useSession();
+
+  const [messages, setMessages] = useState<Record<string, Message>>({});
+  const [messagesList, setMessagesList] = useState<string[]>([]);
   const [message, setMessage] = useState("");
 
+  function addMessage(message: Message): string {
+    const uuid = crypto.randomUUID();
+    setMessages((oldMessages) => ({
+      ...oldMessages,
+      [uuid]: message,
+    }));
+    setMessagesList((oldMessagesList) => [...oldMessagesList, uuid]);
+    return uuid;
+  }
+
   async function sendMessage() {
-    const { available } = await window.ai.languageModel.capabilities();
-    if (available === "no") {
-      alert("Language model not available");
+    if (!session) {
+      alert("No session");
       return;
     }
-    setMessages((oldMessages) => [
-      ...oldMessages,
-      { id: oldMessages.length + 1, content: message, role: "user" },
-    ]);
+    addMessage({ content: message, role: "user" });
     setMessage("");
-    const session = await window.ai.languageModel.create();
-    const result = await session.prompt(message);
-    setMessages((oldMessages) => [
-      ...oldMessages,
-      { id: oldMessages.length + 1, content: result, role: "assistant" },
-    ]);
+    const newAssistantMessageUuid = addMessage({
+      content: "",
+      role: "assistant",
+    });
+    const stream = session.promptStreaming(message);
+    const reader = stream.getReader();
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) {
+        break;
+      }
+      setMessages((oldMessages) => {
+        const newMessage = oldMessages[newAssistantMessageUuid];
+        return {
+          ...oldMessages,
+          [newAssistantMessageUuid]: {
+            ...newMessage,
+            content: newMessage.content + value,
+          },
+        };
+      });
+    }
   }
 
   return (
@@ -41,17 +67,17 @@ export function Chat() {
       <ScrollArea className="flex-1 px-4 py-4">
         <div className="mx-auto max-w-3xl space-y-4">
           <div className="flex flex-col gap-2">
-            {messages.map((message) => (
-              <div key={message.id} className="flex flex-col gap-2">
+            {messagesList.map((messageId) => (
+              <div key={messageId} className="flex flex-col gap-2">
                 <div
                   className={cn(
-                    "rounded-lg bg-muted p-3",
-                    message.role === "user"
+                    "rounded-lg bg-muted p-3 text-sm",
+                    messages[messageId]?.role === "user"
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted"
                   )}
                 >
-                  <p className="text-sm">{message.content}</p>
+                  <Markdown>{messages[messageId]?.content}</Markdown>
                 </div>
               </div>
             ))}
