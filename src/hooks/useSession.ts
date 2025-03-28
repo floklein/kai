@@ -1,9 +1,9 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export function useSession() {
   const [session, setSession] = useState<AILanguageModel | null>(null);
 
-  async function createSession() {
+  const createSession = useCallback(async () => {
     const { available } = await window.ai.languageModel.capabilities();
     if (available === "no") {
       alert("Language model not available");
@@ -11,11 +11,11 @@ export function useSession() {
     }
     const s = await window.ai.languageModel.create();
     setSession(s);
-  }
+  }, []);
 
   useEffect(() => {
     createSession();
-  }, []);
+  }, [createSession]);
 
   return session;
 }

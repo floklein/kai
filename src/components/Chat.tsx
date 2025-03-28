@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "@/hooks/useSession";
 import { cn } from "@/lib/utils";
-import { useState } from "react";
+import { FormEvent, useState } from "react";
 import Markdown from "react-markdown";
 
 interface Message {
@@ -28,7 +28,8 @@ export function Chat() {
     return uuid;
   }
 
-  async function sendMessage() {
+  async function sendMessage(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault();
     if (!session) {
       alert("No session");
       return;
@@ -61,7 +62,7 @@ export function Chat() {
 
   return (
     <div className="flex h-screen flex-col bg-background">
-      <header className="border-b px-4 py-3">
+      <header className="sticky top-0 z-10 border-b bg-background px-4 py-3">
         <h1 className="text-lg font-semibold">AI Chat</h1>
       </header>
       <ScrollArea className="flex-1 px-4 py-4">
@@ -84,16 +85,16 @@ export function Chat() {
           </div>
         </div>
       </ScrollArea>
-      <div className="border-t p-4">
-        <div className="mx-auto flex max-w-3xl gap-2">
-          <Input
+      <div className="sticky bottom-0 z-10 border-t bg-background p-4">
+        <form onSubmit={sendMessage} className="mx-auto flex max-w-3xl gap-2">
+          <Textarea
             placeholder="Type your message..."
-            className="flex-1"
+            className="flex-1 resize-none"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
-          <Button onClick={sendMessage}>Send</Button>
-        </div>
+          <Button type="submit">Send</Button>
+        </form>
       </div>
     </div>
   );
