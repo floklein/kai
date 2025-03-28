@@ -1,7 +1,12 @@
 import { Chat } from "@/components/Chat";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 function App() {
-  return <Chat />;
+  return (
+    <ThemeProvider>
+      <Chat />
+    </ThemeProvider>
+  );
 }
 
 export default App;

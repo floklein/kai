@@ -117,4 +117,7 @@
   body {
     @apply bg-background text-foreground;
   }
+  pre {
+    @apply whitespace-pre-wrap;
+  }
 }

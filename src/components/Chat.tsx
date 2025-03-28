@@ -3,8 +3,17 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "@/hooks/useSession";
 import { cn } from "@/lib/utils";
-import { ChangeEvent, FormEvent, KeyboardEvent, useState } from "react";
+import {
+  ChangeEvent,
+  FormEvent,
+  KeyboardEvent,
+  useEffect,
+  useState,
+} from "react";
 import Markdown from "react-markdown";
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
+import { ModeToggle } from "./ModeToggle";
 
 interface Message {
   content: string;
@@ -30,6 +39,9 @@ export function Chat() {
 
   async function sendMessage(e?: FormEvent<HTMLFormElement>) {
     e?.preventDefault();
+    if (!message.length) {
+      return;
+    }
     if (!session) {
       alert("No session");
       return;
@@ -71,10 +83,18 @@ export function Chat() {
     }
   }
 
+  useEffect(() => {
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: "smooth",
+    });
+  }, [messages]);
+
   return (
     <div className="flex min-h-screen flex-col bg-background">
-      <header className="sticky top-0 z-10 border-b bg-background px-4 py-3">
-        <h1 className="text-lg font-semibold">AI Chat</h1>
+      <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background px-4 py-3">
+        <h1 className="text-lg font-semibold">kAI</h1>
+        <ModeToggle />
       </header>
       <ScrollArea className="flex-1 px-4 py-4">
         <div className="mx-auto max-w-3xl space-y-4">
@@ -97,7 +117,28 @@ export function Chat() {
                         : "bg-muted"
                     )}
                   >
-                    <Markdown>{messages[messageId]?.content}</Markdown>
+                    <Markdown
+                      components={{
+                        code(props) {
+                          const { children, className, node, ...rest } = props;
+                          const match = /language-(\w+)/.exec(className || "");
+                          return match ? (
+                            <SyntaxHighlighter
+                              children={String(children).replace(/\n$/, "")}
+                              language={match[1]}
+                              style={vscDarkPlus}
+                              className="rounded-sm"
+                            />
+                          ) : (
+                            <code {...rest} className={className}>
+                              {children}
+                            </code>
+                          );
+                        },
+                      }}
+                    >
+                      {messages[messageId]?.content}
+                    </Markdown>
                   </div>
                 </div>
               </div>
@@ -108,13 +149,14 @@ export function Chat() {
       <div className="sticky bottom-0 z-10 border-t bg-background p-4">
         <form onSubmit={sendMessage} className="mx-auto flex max-w-3xl gap-2">
           <Textarea
+            autoFocus
             placeholder="Type your message..."
             className="flex-1 resize-none"
             value={message}
             onChange={handleChange}
             onKeyDown={handleKeyDown}
           />
-          <Button type="submit" className="self-end">
+          <Button type="submit" className="self-end" disabled={!message.length}>
             Send
           </Button>
         </form>
