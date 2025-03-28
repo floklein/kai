@@ -3,7 +3,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "@/hooks/useSession";
 import { cn } from "@/lib/utils";
-import { FormEvent, useState } from "react";
+import { ChangeEvent, FormEvent, KeyboardEvent, useState } from "react";
 import Markdown from "react-markdown";
 
 interface Message {
@@ -28,8 +28,8 @@ export function Chat() {
     return uuid;
   }
 
-  async function sendMessage(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault();
+  async function sendMessage(e?: FormEvent<HTMLFormElement>) {
+    e?.preventDefault();
     if (!session) {
       alert("No session");
       return;
@@ -60,8 +60,19 @@ export function Chat() {
     }
   }
 
+  function handleChange(e: ChangeEvent<HTMLTextAreaElement>) {
+    setMessage(e.target.value);
+  }
+
+  function handleKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  }
+
   return (
-    <div className="flex h-screen flex-col bg-background">
+    <div className="flex min-h-screen flex-col bg-background">
       <header className="sticky top-0 z-10 border-b bg-background px-4 py-3">
         <h1 className="text-lg font-semibold">AI Chat</h1>
       </header>
@@ -72,13 +83,22 @@ export function Chat() {
               <div key={messageId} className="flex flex-col gap-2">
                 <div
                   className={cn(
-                    "rounded-lg bg-muted p-3 text-sm",
+                    "flex",
                     messages[messageId]?.role === "user"
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted"
+                      ? "justify-end"
+                      : "justify-start"
                   )}
                 >
-                  <Markdown>{messages[messageId]?.content}</Markdown>
+                  <div
+                    className={cn(
+                      "rounded-lg bg-muted p-3 text-sm max-w-[80%] whitespace-pre-line",
+                      messages[messageId]?.role === "user"
+                        ? "bg-primary text-primary-foreground"
+                        : "bg-muted"
+                    )}
+                  >
+                    <Markdown>{messages[messageId]?.content}</Markdown>
+                  </div>
                 </div>
               </div>
             ))}
@@ -91,9 +111,12 @@ export function Chat() {
             placeholder="Type your message..."
             className="flex-1 resize-none"
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={handleChange}
+            onKeyDown={handleKeyDown}
           />
-          <Button type="submit">Send</Button>
+          <Button type="submit" className="self-end">
+            Send
+          </Button>
         </form>
       </div>
     </div>
