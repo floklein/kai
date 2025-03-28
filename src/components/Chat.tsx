@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import { useSession } from "@/hooks/useSession";
 import { cn } from "@/lib/utils";
@@ -13,7 +12,6 @@ import {
 import Markdown from "react-markdown";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
-import { ModeToggle } from "./ModeToggle";
 
 interface Message {
   content: string;
@@ -91,12 +89,8 @@ export function Chat() {
   }, [messages]);
 
   return (
-    <div className="flex min-h-screen flex-col bg-background">
-      <header className="sticky top-0 z-10 flex items-center justify-between border-b bg-background px-4 py-3">
-        <h1 className="text-lg font-semibold">kAI</h1>
-        <ModeToggle />
-      </header>
-      <ScrollArea className="flex-1 px-4 py-4">
+    <div className="flex flex-col h-full">
+      <div className="flex-1 px-4 py-4">
         <div className="mx-auto max-w-3xl space-y-4">
           <div className="flex flex-col gap-2">
             {messagesList.map((messageId) => (
@@ -145,7 +139,7 @@ export function Chat() {
             ))}
           </div>
         </div>
-      </ScrollArea>
+      </div>
       <div className="sticky bottom-0 z-10 border-t bg-background p-4">
         <form onSubmit={sendMessage} className="mx-auto flex max-w-3xl gap-2">
           <Textarea

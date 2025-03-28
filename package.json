@@ -10,10 +10,15 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-dropdown-menu": "^2.1.6",
+    "@radix-ui/react-label": "^2.1.2",
     "@radix-ui/react-scroll-area": "^1.2.3",
+    "@radix-ui/react-separator": "^1.1.2",
     "@radix-ui/react-slot": "^1.1.2",
+    "@radix-ui/react-tooltip": "^1.1.8",
     "@tailwindcss/vite": "^4.0.17",
+    "@tanstack/react-router": "^1.114.29",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "lucide-react": "^0.484.0",
@@ -27,6 +32,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
+    "@tanstack/react-router-devtools": "^1.114.29",
+    "@tanstack/router-plugin": "^1.114.29",
     "@types/dom-chromium-ai": "^0.0.6",
     "@types/node": "^22.13.14",
     "@types/react": "^19.0.10",
