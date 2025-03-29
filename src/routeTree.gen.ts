@@ -10,104 +10,104 @@
 
 // Import Routes
 
-import { Route as rootRoute } from './routes/__root'
-import { Route as NewImport } from './routes/new'
-import { Route as ChatIdImport } from './routes/$chatId'
-import { Route as IndexImport } from './routes/index'
+import { Route as rootRoute } from "./routes/__root";
+import { Route as NewImport } from "./routes/new";
+import { Route as ChatIdImport } from "./routes/$chatId";
+import { Route as IndexImport } from "./routes/index";
 
 // Create/Update Routes
 
 const NewRoute = NewImport.update({
-  id: '/new',
-  path: '/new',
+  id: "/new",
+  path: "/new",
   getParentRoute: () => rootRoute,
-} as any)
+} as any);
 
 const ChatIdRoute = ChatIdImport.update({
-  id: '/$chatId',
-  path: '/$chatId',
+  id: "/$chatId",
+  path: "/$chatId",
   getParentRoute: () => rootRoute,
-} as any)
+} as any);
 
 const IndexRoute = IndexImport.update({
-  id: '/',
-  path: '/',
+  id: "/",
+  path: "/",
   getParentRoute: () => rootRoute,
-} as any)
+} as any);
 
 // Populate the FileRoutesByPath interface
 
-declare module '@tanstack/react-router' {
+declare module "@tanstack/react-router" {
   interface FileRoutesByPath {
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/$chatId': {
-      id: '/$chatId'
-      path: '/$chatId'
-      fullPath: '/$chatId'
-      preLoaderRoute: typeof ChatIdImport
-      parentRoute: typeof rootRoute
-    }
-    '/new': {
-      id: '/new'
-      path: '/new'
-      fullPath: '/new'
-      preLoaderRoute: typeof NewImport
-      parentRoute: typeof rootRoute
-    }
+    "/": {
+      id: "/";
+      path: "/";
+      fullPath: "/";
+      preLoaderRoute: typeof IndexImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/$chatId": {
+      id: "/$chatId";
+      path: "/$chatId";
+      fullPath: "/$chatId";
+      preLoaderRoute: typeof ChatIdImport;
+      parentRoute: typeof rootRoute;
+    };
+    "/new": {
+      id: "/new";
+      path: "/new";
+      fullPath: "/new";
+      preLoaderRoute: typeof NewImport;
+      parentRoute: typeof rootRoute;
+    };
   }
 }
 
 // Create and export the route tree
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/$chatId': typeof ChatIdRoute
-  '/new': typeof NewRoute
+  "/": typeof IndexRoute;
+  "/$chatId": typeof ChatIdRoute;
+  "/new": typeof NewRoute;
 }
 
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/$chatId': typeof ChatIdRoute
-  '/new': typeof NewRoute
+  "/": typeof IndexRoute;
+  "/$chatId": typeof ChatIdRoute;
+  "/new": typeof NewRoute;
 }
 
 export interface FileRoutesById {
-  __root__: typeof rootRoute
-  '/': typeof IndexRoute
-  '/$chatId': typeof ChatIdRoute
-  '/new': typeof NewRoute
+  __root__: typeof rootRoute;
+  "/": typeof IndexRoute;
+  "/$chatId": typeof ChatIdRoute;
+  "/new": typeof NewRoute;
 }
 
 export interface FileRouteTypes {
-  fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$chatId' | '/new'
-  fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$chatId' | '/new'
-  id: '__root__' | '/' | '/$chatId' | '/new'
-  fileRoutesById: FileRoutesById
+  fileRoutesByFullPath: FileRoutesByFullPath;
+  fullPaths: "/" | "/$chatId" | "/new";
+  fileRoutesByTo: FileRoutesByTo;
+  to: "/" | "/$chatId" | "/new";
+  id: "__root__" | "/" | "/$chatId" | "/new";
+  fileRoutesById: FileRoutesById;
 }
 
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  ChatIdRoute: typeof ChatIdRoute
-  NewRoute: typeof NewRoute
+  IndexRoute: typeof IndexRoute;
+  ChatIdRoute: typeof ChatIdRoute;
+  NewRoute: typeof NewRoute;
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ChatIdRoute: ChatIdRoute,
   NewRoute: NewRoute,
-}
+};
 
 export const routeTree = rootRoute
   ._addFileChildren(rootRouteChildren)
-  ._addFileTypes<FileRouteTypes>()
+  ._addFileTypes<FileRouteTypes>();
 
 /* ROUTE_MANIFEST_START
 {

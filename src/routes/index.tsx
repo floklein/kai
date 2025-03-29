@@ -10,12 +10,12 @@ export const Route = createFileRoute("/")({
             to: `/$chatId`,
             params: { chatId: firstChat.id.toString() },
           }
-        : { to: "/new" }
+        : { to: "/new" },
     );
   },
   component: RouteComponent,
 });
 
 function RouteComponent() {
-  return <div>Hello "/"!</div>;
+  return null;
 }

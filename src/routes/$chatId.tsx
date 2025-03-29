@@ -107,7 +107,7 @@ function RouteComponent() {
                     "flex",
                     messages[messageId]?.role === "user"
                       ? "justify-end"
-                      : "justify-start"
+                      : "justify-start",
                   )}
                 >
                   <div
@@ -115,7 +115,7 @@ function RouteComponent() {
                       "rounded-lg bg-muted p-3 text-sm max-w-[80%] whitespace-pre-line",
                       messages[messageId]?.role === "user"
                         ? "bg-primary text-primary-foreground"
-                        : "bg-muted"
+                        : "bg-muted",
                     )}
                   >
                     <Markdown
