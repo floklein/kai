@@ -11,10 +11,17 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as NewImport } from './routes/new'
 import { Route as ChatIdImport } from './routes/$chatId'
 import { Route as IndexImport } from './routes/index'
 
 // Create/Update Routes
+
+const NewRoute = NewImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const ChatIdRoute = ChatIdImport.update({
   id: '/$chatId',
@@ -46,6 +53,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ChatIdImport
       parentRoute: typeof rootRoute
     }
+    '/new': {
+      id: '/new'
+      path: '/new'
+      fullPath: '/new'
+      preLoaderRoute: typeof NewImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -54,36 +68,41 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/$chatId': typeof ChatIdRoute
+  '/new': typeof NewRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/$chatId': typeof ChatIdRoute
+  '/new': typeof NewRoute
 }
 
 export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/$chatId': typeof ChatIdRoute
+  '/new': typeof NewRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/$chatId'
+  fullPaths: '/' | '/$chatId' | '/new'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/$chatId'
-  id: '__root__' | '/' | '/$chatId'
+  to: '/' | '/$chatId' | '/new'
+  id: '__root__' | '/' | '/$chatId' | '/new'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ChatIdRoute: typeof ChatIdRoute
+  NewRoute: typeof NewRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ChatIdRoute: ChatIdRoute,
+  NewRoute: NewRoute,
 }
 
 export const routeTree = rootRoute
@@ -97,7 +116,8 @@ export const routeTree = rootRoute
       "filePath": "__root.tsx",
       "children": [
         "/",
-        "/$chatId"
+        "/$chatId",
+        "/new"
       ]
     },
     "/": {
@@ -105,6 +125,9 @@ export const routeTree = rootRoute
     },
     "/$chatId": {
       "filePath": "$chatId.tsx"
+    },
+    "/new": {
+      "filePath": "new.tsx"
     }
   }
 }

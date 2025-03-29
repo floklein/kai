@@ -1,5 +1,9 @@
-import * as React from "react";
-
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   Sidebar,
   SidebarContent,
@@ -8,41 +12,36 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
+  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { Link, useLocation } from "@tanstack/react-router";
-import { BotMessageSquare } from "lucide-react";
+import { db } from "@/lib/db";
+import { Link, useLocation, useRouter } from "@tanstack/react-router";
+import { useLiveQuery } from "dexie-react-hooks";
+import {
+  BotMessageSquare,
+  CirclePlus,
+  MoreHorizontal,
+  Trash2,
+} from "lucide-react";
+import { ComponentProps } from "react";
 
-function createLinks(quantity: number) {
-  return Array.from({ length: quantity }, (_, i) => ({
-    title: `Chat ${i + 1}`,
-    url: `/${crypto.randomUUID()}`,
-  }));
-}
-
-const data = [
-  {
-    title: "Today",
-    items: createLinks(2),
-  },
-  {
-    title: "This week",
-    items: createLinks(5),
-  },
-  {
-    title: "This month",
-    items: createLinks(10),
-  },
-  {
-    title: "Others",
-    items: createLinks(20),
-  },
-];
-
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
   const { pathname } = useLocation();
+  const router = useRouter();
+
+  const chats = useLiveQuery(() => db.chats.reverse().toArray());
+
+  function deleteChat(id: number) {
+    return async () => {
+      await db.chats.delete(id);
+      router.navigate({
+        to: "/",
+      });
+    };
+  }
 
   return (
     <Sidebar {...props}>
@@ -51,22 +50,56 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <h1 className="text-lg font-semibold">kAI</h1>
       </SidebarHeader>
       <SidebarContent>
-        {data.map((item) => (
-          <SidebarGroup key={item.title}>
-            <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
-            <SidebarGroupContent>
-              <SidebarMenu>
-                {item.items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild isActive={pathname === item.url}>
-                      <Link to={item.url}>{item.title}</Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
-              </SidebarMenu>
-            </SidebarGroupContent>
-          </SidebarGroup>
-        ))}
+        <SidebarGroup>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild isActive={pathname === "/new"}>
+                  <Link to="/new">
+                    <CirclePlus />
+                    <span>New chat</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+        <SidebarGroup>
+          <SidebarGroupLabel>Chats</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {chats?.map((chat) => (
+                <SidebarMenuItem key={chat.id}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname === `/${chat.id}`}
+                  >
+                    <Link to="/$chatId" params={{ chatId: chat.id.toString() }}>
+                      <span className="truncate">
+                        {chat.messages[chat.messagesList[0]]?.content ||
+                          "New chat"}
+                      </span>
+                    </Link>
+                  </SidebarMenuButton>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <SidebarMenuAction showOnHover>
+                        <MoreHorizontal />
+                        <span className="sr-only">More</span>
+                      </SidebarMenuAction>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem onClick={deleteChat(chat.id)}>
+                        <Trash2 />
+                        <span>Delete</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
