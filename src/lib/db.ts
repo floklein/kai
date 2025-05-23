@@ -1,6 +1,6 @@
 import Dexie, { EntityTable } from "dexie";
 
-interface Message extends AILanguageModelPrompt {
+interface Message extends LanguageModelMessage {
   uuid: string;
 }
 

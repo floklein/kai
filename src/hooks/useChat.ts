@@ -3,7 +3,7 @@ import { useLiveQuery } from "dexie-react-hooks";
 import { useCallback, useEffect, useState } from "react";
 
 export function useChat(chatId: number) {
-  const [session, setSession] = useState<AILanguageModel | null>(null);
+  const [session, setSession] = useState<LanguageModel | null>(null);
 
   const createSession = useCallback(async () => {
     const chat = await db.chats.get(chatId);
@@ -11,13 +11,13 @@ export function useChat(chatId: number) {
       alert("Chat not found");
       return;
     }
-    const { available } = await window.ai.languageModel.capabilities();
-    if (available === "no") {
+    const availability = await LanguageModel.availability();
+    if (availability === "unavailable") {
       alert("Language model not available");
       setSession(null);
       return;
     }
-    const s = await window.ai.languageModel.create({
+    const s = await LanguageModel.create({
       initialPrompts: chat.messagesList.map((uuid) => chat.messages[uuid]),
     });
     setSession(s);

@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useChat } from "@/hooks/useChat";
 import { db } from "@/lib/db";
+import { getMessageContent } from "@/lib/message";
 import { cn } from "@/lib/utils";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import {
@@ -138,7 +139,7 @@ function RouteComponent() {
                         },
                       }}
                     >
-                      {messages[messageId]?.content}
+                      {getMessageContent(messages[messageId])}
                     </Markdown>
                   </div>
                 </div>

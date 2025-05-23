@@ -18,6 +18,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { db } from "@/lib/db";
+import { getMessageContent } from "@/lib/message";
 import { Link, useLocation, useRouter } from "@tanstack/react-router";
 import { useLiveQuery } from "dexie-react-hooks";
 import {
@@ -76,8 +77,9 @@ export function AppSidebar({ ...props }: ComponentProps<typeof Sidebar>) {
                   >
                     <Link to="/$chatId" params={{ chatId: chat.id.toString() }}>
                       <span className="truncate">
-                        {chat.messages[chat.messagesList[0]]?.content ||
-                          "New chat"}
+                        {getMessageContent(
+                          chat.messages[chat.messagesList[0]],
+                        ) || "New chat"}
                       </span>
                     </Link>
                   </SidebarMenuButton>
