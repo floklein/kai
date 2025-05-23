@@ -27,9 +27,22 @@ export function useChat(chatId: number) {
     createSession();
   }, [createSession]);
 
-  async function getMessagesAsync() {
+  async function appendMessage(messageId: string, content: string) {
     const chat = await db.chats.get(chatId);
-    return chat?.messages ?? {};
+    if (!chat) {
+      alert("Chat not found");
+      return;
+    }
+    const { messages } = chat;
+    await db.chats.update(chatId, {
+      messages: {
+        ...messages,
+        [messageId]: {
+          ...messages[messageId],
+          content: messages[messageId].content + content,
+        },
+      },
+    });
   }
 
   async function addMessage(message: Omit<Message, "uuid">) {
@@ -55,7 +68,7 @@ export function useChat(chatId: number) {
     session,
     messages: chat?.messages ?? {},
     messagesList: chat?.messagesList ?? [],
-    getMessagesAsync,
     addMessage,
+    appendMessage,
   };
 }

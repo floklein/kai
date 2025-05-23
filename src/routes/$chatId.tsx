@@ -32,10 +32,10 @@ export const Route = createFileRoute("/$chatId")({
 });
 
 function RouteComponent() {
-  const { chatId } = Route.useParams();
+  const chatId = Number(Route.useParams().chatId);
 
-  const { session, messages, messagesList, addMessage, getMessagesAsync } =
-    useChat(Number(chatId));
+  const { session, messages, messagesList, addMessage, appendMessage } =
+    useChat(chatId);
 
   const [message, setMessage] = useState("");
 
@@ -65,16 +65,7 @@ function RouteComponent() {
       if (done) {
         break;
       }
-      const messages = await getMessagesAsync();
-      await db.chats.update(Number(chatId), {
-        messages: {
-          ...messages,
-          [newAssistantMessageUuid]: {
-            ...messages[newAssistantMessageUuid],
-            content: messages[newAssistantMessageUuid].content + value,
-          },
-        },
-      });
+      await appendMessage(newAssistantMessageUuid, value);
     }
   }
 
