@@ -5,8 +5,10 @@ import { db } from "@/lib/db";
 import { getMessageContent } from "@/lib/message";
 import { cn } from "@/lib/utils";
 import { createFileRoute, redirect } from "@tanstack/react-router";
+import { X } from "lucide-react";
 import {
   ChangeEvent,
+  ClipboardEvent,
   FormEvent,
   KeyboardEvent,
   useEffect,
@@ -37,28 +39,50 @@ function RouteComponent() {
   const { session, messages, messagesList, addMessage, appendMessage } =
     useChat(chatId);
 
-  const [message, setMessage] = useState("");
+  const [text, setText] = useState("");
+  const [blobs, setBlobs] = useState<Blob[]>([]);
 
   async function sendMessage(e?: FormEvent<HTMLFormElement>) {
     e?.preventDefault();
-    if (!message.length) {
+    if (!text.length) {
       return;
     }
     if (!session) {
       alert("No session");
       return;
     }
-    await addMessage({ content: message, role: "user" });
-    setMessage("");
+    const content: LanguageModelMessageContent[] = [
+      ...blobs.map(
+        (blob): LanguageModelMessageContent => ({
+          type: "image",
+          value: blob,
+        }),
+      ),
+      {
+        type: "text",
+        value: text,
+      },
+    ];
+    const stream = session.promptStreaming([
+      {
+        role: "user",
+        content,
+      },
+    ]);
+    await addMessage({
+      role: "user",
+      content,
+    });
+    setText("");
+    setBlobs([]);
     const newAssistantMessageUuid = await addMessage({
-      content: "",
       role: "assistant",
+      content: "",
     });
     if (!newAssistantMessageUuid) {
       alert("Failed to add message");
       return;
     }
-    const stream = session.promptStreaming(message);
     const reader = stream.getReader();
     while (true) {
       const { done, value } = await reader.read();
@@ -69,8 +93,30 @@ function RouteComponent() {
     }
   }
 
-  function handleChange(e: ChangeEvent<HTMLTextAreaElement>) {
-    setMessage(e.target.value);
+  function handleTextChange(e: ChangeEvent<HTMLTextAreaElement>) {
+    setText(e.target.value);
+  }
+
+  function handleFilesChange(e: ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files) {
+      return;
+    }
+    const imageFiles = Array.from(files)
+      .filter((file) => file.type.startsWith("image/"))
+      .map((file) => new Blob([file]));
+    setBlobs((oldBlobs) => [...oldBlobs, ...imageFiles]);
+  }
+
+  function handlePaste(e: ClipboardEvent<HTMLTextAreaElement>) {
+    const files = e.clipboardData.files;
+    if (!files.length) {
+      return;
+    }
+    const imageFiles = Array.from(files)
+      .filter((file) => file.type.startsWith("image/"))
+      .map((file) => new Blob([file]));
+    setBlobs((oldBlobs) => [...oldBlobs, ...imageFiles]);
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLTextAreaElement>) {
@@ -78,6 +124,12 @@ function RouteComponent() {
       e.preventDefault();
       sendMessage();
     }
+  }
+
+  function handleRemoveBlob(index: number) {
+    return () => {
+      setBlobs((oldBlobs) => oldBlobs.filter((_, i) => i !== index));
+    };
   }
 
   useEffect(() => {
@@ -140,16 +192,44 @@ function RouteComponent() {
         </div>
       </div>
       <div className="sticky bottom-0 z-10 border-t bg-background p-4">
+        {blobs.length > 0 && (
+          <div className="mx-auto max-w-3xl flex gap-2 mb-4 overflow-x-auto">
+            {blobs.map((blob, index) => (
+              <div key={index} className="relative">
+                <img
+                  src={URL.createObjectURL(blob)}
+                  alt={`Preview ${index + 1}`}
+                  className="h-20 w-20 object-cover rounded-lg"
+                />
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  onClick={handleRemoveBlob(index)}
+                  className="absolute top-1 right-1 h-6 w-6"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
         <form onSubmit={sendMessage} className="mx-auto flex max-w-3xl gap-2">
           <Textarea
             autoFocus
             placeholder="Type your message..."
             className="flex-1 resize-none"
-            value={message}
-            onChange={handleChange}
+            value={text}
+            onChange={handleTextChange}
             onKeyDown={handleKeyDown}
+            onPaste={handlePaste}
           />
-          <Button type="submit" className="self-end" disabled={!message.length}>
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleFilesChange}
+          />
+          <Button type="submit" className="self-end" disabled={!text.length}>
             Send
           </Button>
         </form>
