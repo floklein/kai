@@ -4,7 +4,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useChat } from "@/hooks/useChat";
 import { db } from "@/lib/db";
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import {
   ChangeEvent,
   ClipboardEvent,
@@ -169,21 +169,35 @@ function RouteComponent() {
           </div>
         )}
         <form onSubmit={sendMessage} className="mx-auto flex max-w-3xl gap-2">
-          <Textarea
-            autoFocus
-            placeholder="Type your message..."
-            className="flex-1 resize-none"
-            value={text}
-            onChange={handleTextChange}
-            onKeyDown={handleKeyDown}
-            onPaste={handlePaste}
-          />
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleFilesChange}
-          />
+          <div className="relative flex-1">
+            <Textarea
+              autoFocus
+              placeholder="Type your message..."
+              className="flex-1 resize-none pb-10"
+              value={text}
+              onChange={handleTextChange}
+              onKeyDown={handleKeyDown}
+              onPaste={handlePaste}
+            />
+            <Button
+              variant="secondary"
+              size="icon"
+              className="absolute bottom-2 left-2 h-6 w-6 rounded-full"
+              asChild
+            >
+              <label htmlFor="file-input">
+                <Plus className="h-4 w-4" />
+              </label>
+            </Button>
+            <input
+              id="file-input"
+              type="file"
+              accept="image/*"
+              hidden
+              multiple
+              onChange={handleFilesChange}
+            />
+          </div>
           <Button type="submit" className="self-end" disabled={!text.length}>
             Send
           </Button>
