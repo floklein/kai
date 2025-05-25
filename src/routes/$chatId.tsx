@@ -1,6 +1,12 @@
 import { Message } from "@/components/Message";
+import { RecordButton } from "@/components/RecordButton";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import { useChat } from "@/hooks/useChat";
 import { db } from "@/lib/db";
 import { createFileRoute, redirect } from "@tanstack/react-router";
@@ -10,6 +16,7 @@ import {
   ClipboardEvent,
   FormEvent,
   KeyboardEvent,
+  useCallback,
   useEffect,
   useState,
 } from "react";
@@ -128,6 +135,48 @@ function RouteComponent() {
     };
   }
 
+  const sendAudio = useCallback(
+    async (blob: Blob) => {
+      if (!session) {
+        alert("No session");
+        return;
+      }
+      const content: LanguageModelMessageContent[] = [
+        {
+          type: "audio",
+          value: blob,
+        },
+      ];
+      const stream = session.promptStreaming([
+        {
+          role: "user",
+          content,
+        },
+      ]);
+      await addMessage({
+        role: "user",
+        content,
+      });
+      const newAssistantMessageUuid = await addMessage({
+        role: "assistant",
+        content: "",
+      });
+      if (!newAssistantMessageUuid) {
+        alert("Failed to add message");
+        return;
+      }
+      const reader = stream.getReader();
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) {
+          break;
+        }
+        await appendMessage(newAssistantMessageUuid, value);
+      }
+    },
+    [session, addMessage, appendMessage],
+  );
+
   useEffect(() => {
     window.scrollTo({
       top: document.body.scrollHeight,
@@ -173,29 +222,39 @@ function RouteComponent() {
             <Textarea
               autoFocus
               placeholder="Type your message..."
-              className="flex-1 resize-none pb-10"
+              className="flex-1 resize-none pb-13"
               value={text}
               onChange={handleTextChange}
               onKeyDown={handleKeyDown}
               onPaste={handlePaste}
             />
-            <Button
-              variant="secondary"
-              size="icon"
-              className="absolute bottom-2 left-2 h-6 w-6 rounded-full"
-              asChild
-            >
-              <label htmlFor="file-input">
-                <Plus className="h-4 w-4" />
-              </label>
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="absolute bottom-2 left-2 rounded-full"
+                  asChild
+                >
+                  <label htmlFor="file-input">
+                    <Plus />
+                  </label>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Add an image</TooltipContent>
+            </Tooltip>
             <input
               id="file-input"
+              value=""
               type="file"
               accept="image/*"
               hidden
               multiple
               onChange={handleFilesChange}
+            />
+            <RecordButton
+              className="absolute bottom-2 right-2"
+              onRecord={sendAudio}
             />
           </div>
           <Button type="submit" className="self-end" disabled={!text.length}>

@@ -17,7 +17,7 @@ function RootComponent() {
       <AppSidebar />
       <SidebarInset className="min-h-screen">
         <header className="flex h-16 shrink-0 items-center gap-2 border-b px-4 justify-between sticky top-0 bg-background z-10">
-          <SidebarTrigger className="-ml-1" />
+          <SidebarTrigger className="-ml-2" />
           <ModeToggle />
         </header>
         <Outlet />

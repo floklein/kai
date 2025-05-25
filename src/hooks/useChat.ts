@@ -12,7 +12,7 @@ export function useChat(chatId: number) {
       return;
     }
     const availability = await LanguageModel.availability({
-      expectedInputs: [{ type: "image" }],
+      expectedInputs: [{ type: "image" }, { type: "audio" }],
     });
     console.log("Availability:", availability);
     if (availability === "unavailable") {
@@ -24,7 +24,8 @@ export function useChat(chatId: number) {
       initialPrompts: chat.messagesList.length
         ? chat.messagesList.map((uuid) => chat.messages[uuid])
         : undefined,
-      expectedInputs: [{ type: "image" }],
+      expectedInputs: [{ type: "image" }, { type: "audio", languages: ["en"] }],
+      expectedOutputs: [{ type: "text", languages: ["en"] }],
     });
     setSession(s);
   }, [chatId]);
