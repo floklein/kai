@@ -1,9 +1,8 @@
+import { Message } from "@/components/Message";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useChat } from "@/hooks/useChat";
 import { db } from "@/lib/db";
-import { getMessageContent } from "@/lib/message";
-import { cn } from "@/lib/utils";
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { X } from "lucide-react";
 import {
@@ -14,9 +13,6 @@ import {
   useEffect,
   useState,
 } from "react";
-import Markdown from "react-markdown";
-import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { vscDarkPlus } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 export const Route = createFileRoute("/$chatId")({
   beforeLoad: async ({ params }) => {
@@ -145,48 +141,7 @@ function RouteComponent() {
         <div className="mx-auto max-w-3xl space-y-4">
           <div className="flex flex-col gap-2">
             {messagesList.map((messageId) => (
-              <div key={messageId} className="flex flex-col gap-2">
-                <div
-                  className={cn(
-                    "flex",
-                    messages[messageId]?.role === "user"
-                      ? "justify-end"
-                      : "justify-start",
-                  )}
-                >
-                  <div
-                    className={cn(
-                      "rounded-lg bg-muted p-3 text-sm max-w-[80%] whitespace-pre-line",
-                      messages[messageId]?.role === "user"
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-muted",
-                    )}
-                  >
-                    <Markdown
-                      components={{
-                        code(props) {
-                          const { children, className, node, ...rest } = props;
-                          const match = /language-(\w+)/.exec(className || "");
-                          return match ? (
-                            <SyntaxHighlighter
-                              children={String(children).replace(/\n$/, "")}
-                              language={match[1]}
-                              style={vscDarkPlus}
-                              className="rounded-sm"
-                            />
-                          ) : (
-                            <code {...rest} className={className}>
-                              {children}
-                            </code>
-                          );
-                        },
-                      }}
-                    >
-                      {getMessageContent(messages[messageId])}
-                    </Markdown>
-                  </div>
-                </div>
-              </div>
+              <Message key={messageId} message={messages[messageId]} />
             ))}
           </div>
         </div>

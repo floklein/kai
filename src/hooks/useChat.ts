@@ -11,14 +11,20 @@ export function useChat(chatId: number) {
       alert("Chat not found");
       return;
     }
-    const availability = await LanguageModel.availability();
+    const availability = await LanguageModel.availability({
+      expectedInputs: [{ type: "image" }],
+    });
+    console.log("Availability:", availability);
     if (availability === "unavailable") {
       alert("Language model not available");
       setSession(null);
       return;
     }
     const s = await LanguageModel.create({
-      initialPrompts: chat.messagesList.map((uuid) => chat.messages[uuid]),
+      initialPrompts: chat.messagesList.length
+        ? chat.messagesList.map((uuid) => chat.messages[uuid])
+        : undefined,
+      expectedInputs: [{ type: "image" }],
     });
     setSession(s);
   }, [chatId]);
