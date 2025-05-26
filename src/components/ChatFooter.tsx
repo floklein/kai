@@ -5,7 +5,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { Plus, X } from "lucide-react";
+import { Plus } from "lucide-react";
 import {
   ChangeEvent,
   ClipboardEvent,
@@ -13,6 +13,8 @@ import {
   KeyboardEvent,
   useState,
 } from "react";
+import { PhotoProvider } from "react-photo-view";
+import { ImagePreview } from "./ImagePreview";
 import { RecordButton } from "./RecordButton";
 
 export function ChatFooter({
@@ -80,25 +82,17 @@ export function ChatFooter({
   return (
     <div className="sticky bottom-0 z-10 border-t bg-background p-4">
       {blobs.length > 0 && (
-        <div className="mx-auto max-w-3xl flex gap-2 mb-4 overflow-x-auto">
-          {blobs.map((blob, index) => (
-            <div key={index} className="relative">
-              <img
-                src={URL.createObjectURL(blob)}
-                alt={`Preview ${index + 1}`}
-                className="h-20 w-20 object-cover rounded-lg"
+        <PhotoProvider maskOpacity={0.75}>
+          <div className="mx-auto max-w-3xl flex gap-2 mb-4 overflow-x-auto">
+            {blobs.map((blob, index) => (
+              <ImagePreview
+                key={index}
+                image={blob}
+                onDelete={handleRemoveBlob(index)}
               />
-              <Button
-                variant="secondary"
-                size="icon"
-                onClick={handleRemoveBlob(index)}
-                className="absolute top-1 right-1 h-6 w-6"
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </PhotoProvider>
       )}
       <form onSubmit={handleSubmit} className="mx-auto flex max-w-3xl gap-2">
         <div className="relative flex-1">

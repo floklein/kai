@@ -1,5 +1,6 @@
 import type { Message } from "@/lib/db";
-
+import { PhotoProvider } from "react-photo-view";
+import "react-photo-view/dist/react-photo-view.css";
 import { MessageAudio } from "./MessageAudio";
 import { MessageImage } from "./MessageImage";
 import { MessageText } from "./MessageText";
@@ -9,7 +10,7 @@ export function Message({ message }: { message: Message }) {
     return <MessageText role={message.role} text={message.content} />;
   }
   return (
-    <>
+    <PhotoProvider maskOpacity={0.75}>
       {message.content.map((content, index) => {
         if (typeof content.value === "string") {
           return (
@@ -36,6 +37,6 @@ export function Message({ message }: { message: Message }) {
         }
         return null;
       })}
-    </>
+    </PhotoProvider>
   );
 }

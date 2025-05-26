@@ -1,5 +1,6 @@
 import type { Message } from "@/lib/db";
 import { cn } from "@/lib/utils";
+import { PhotoView } from "react-photo-view";
 
 export function MessageImage({
   role,
@@ -23,11 +24,13 @@ export function MessageImage({
             role === "user" ? "bg-primary text-primary-foreground" : "bg-muted",
           )}
         >
-          <img
-            src={imageUrl}
-            alt="Image"
-            className="w-full h-full object-contain"
-          />
+          <PhotoView src={imageUrl}>
+            <img
+              src={imageUrl}
+              alt="Image"
+              className="w-full h-full object-contain"
+            />
+          </PhotoView>
         </div>
       </div>
     </div>
