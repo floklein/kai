@@ -17,7 +17,7 @@ export function ImagePreview({
         <img
           src={imageUrl}
           alt="Image preview"
-          className="h-20 w-20 object-cover rounded-lg"
+          className="h-20 w-20 object-cover rounded-lg hover:brightness-80"
         />
       </PhotoView>
       <Button

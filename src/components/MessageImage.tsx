@@ -28,7 +28,7 @@ export function MessageImage({
             <img
               src={imageUrl}
               alt="Image"
-              className="w-full h-full object-contain"
+              className="w-full h-full object-contain hover:brightness-80"
             />
           </PhotoView>
         </div>

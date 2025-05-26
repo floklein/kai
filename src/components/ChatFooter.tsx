@@ -80,7 +80,7 @@ export function ChatFooter({
   }
 
   return (
-    <div className="sticky bottom-0 z-10 border-t bg-background p-4">
+    <div className="sticky bottom-0 z-10 bg-background p-4">
       {blobs.length > 0 && (
         <PhotoProvider maskOpacity={0.75}>
           <div className="mx-auto max-w-3xl flex gap-2 mb-4 overflow-x-auto">
@@ -99,7 +99,7 @@ export function ChatFooter({
           <Textarea
             autoFocus
             placeholder="Type your message..."
-            className="flex-1 resize-none pb-13"
+            className="flex-1 resize-none pb-13 border-0"
             value={text}
             onChange={handleTextChange}
             onKeyDown={handleKeyDown}
