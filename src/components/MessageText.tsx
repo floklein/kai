@@ -22,8 +22,8 @@ export function MessageText({
       >
         <div
           className={cn(
-            "rounded-lg bg-muted p-3 text-sm max-w-[80%] whitespace-pre-line",
-            role === "user" ? "bg-primary text-primary-foreground" : "bg-muted",
+            "whitespace-pre-line py-3",
+            role === "user" && "max-w-[80%] rounded-lg bg-muted px-4",
           )}
         >
           <Markdown

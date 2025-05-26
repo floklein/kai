@@ -20,8 +20,8 @@ export function MessageImage({
       >
         <div
           className={cn(
-            "rounded-lg bg-muted text-sm max-w-[80%] whitespace-pre-line overflow-hidden",
-            role === "user" ? "bg-primary text-primary-foreground" : "bg-muted",
+            "whitespace-pre-line overflow-hidden",
+            role === "user" && "max-w-[80%] rounded-lg bg-muted",
           )}
         >
           <PhotoView src={imageUrl}>
